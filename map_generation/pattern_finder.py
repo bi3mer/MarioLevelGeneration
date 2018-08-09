@@ -1,6 +1,6 @@
 from PIL import Image, ImageDraw
 
-sample_map = '../mario_levels/png/1-1.png'
+sample_map = '../levels/png/1-1.png'
 step_size = 16
 
 
