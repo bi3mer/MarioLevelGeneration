@@ -5,7 +5,7 @@ import os
 step_size = 16
 
 grid_values = {}
-index = 33
+index = 48
 
 def convert_square_to_map_character(pixels, w0, h0, w1, h1):
 	global index
@@ -48,7 +48,7 @@ def convert_mario_png_to_map(png_path):
 if __name__ == '__main__':
 	png_dir = '../levels/png/'
 	map_dir = '../levels/map/'
-
+	
 	for png in tqdm(os.listdir(png_dir)):
 		result = convert_mario_png_to_map(png_dir + png)
 
