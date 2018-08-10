@@ -5,7 +5,7 @@ import os
 step_size = 16
 
 grid_values = {}
-index = 48
+index = 0
 
 def convert_square_to_map_character(pixels, w0, h0, w1, h1):
 	global index
@@ -57,4 +57,3 @@ if __name__ == '__main__':
 		f.close()
 
 		grid_values = {}
-		index = 48
