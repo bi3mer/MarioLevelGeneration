@@ -5,7 +5,7 @@ import os
 step_size = 16
 
 grid_values = {}
-index = 0
+index = 48
 
 def convert_square_to_map_character(pixels, w0, h0, w1, h1):
 	global index
@@ -14,6 +14,7 @@ def convert_square_to_map_character(pixels, w0, h0, w1, h1):
 	for w in xrange(w0, w1):
 		for h in xrange(h0, h1):
 			grid_value += str(pixels[w,h][0])
+		grid_value +='\n'
 
 	if grid_value not in grid_values:
 		grid_values[grid_value] = index
@@ -28,14 +29,15 @@ def convert_mario_png_to_map(png_path):
 	pixels = im.load()
 	txt_map = ''
 
-	for h0 in range(8, height - step_size, step_size):
-		h1 = h0 + step_size - 1
-		if h1 >= height:
+	for w0 in range(0, width, step_size):
+		w1 = w0 + step_size - 1
+		if w1 > width:
 			continue
 
-		for w0 in range(0, width, step_size):
-			w1 = w0 + step_size - 1
-			if w1 > width:
+		# bug here.  the iteration is ending at 16 but should be ending at 8.
+		for h0 in range(height - step_size, 8, -step_size):
+			h1 = h0 + step_size - 1
+			if h1 <= step_size + 8:
 				continue
 
 			# convert index to ascii character
@@ -48,12 +50,15 @@ def convert_mario_png_to_map(png_path):
 if __name__ == '__main__':
 	png_dir = '../levels/png/'
 	map_dir = '../levels/map/'
-	
-	for png in tqdm(os.listdir(png_dir)):
-		result = convert_mario_png_to_map(png_dir + png)
 
-		f = open(map_dir + png.replace('.png', '.map'), 'w')
-		f.write(result)
-		f.close()
+	print convert_mario_png_to_map(png_dir + '1-1.png')
 
-		grid_values = {}
+	# for png in tqdm(os.listdir(png_dir)):
+	# 	result = convert_mario_png_to_map(png_dir + png)
+
+	# 	f = open(map_dir + png.replace('.png', '.map'), 'w')
+	# 	f.write(result)
+	# 	f.close()
+
+	# 	grid_values = {}
+	# 	index = 48
