@@ -34,16 +34,21 @@ def convert_mario_png_to_map(png_path):
 		if w1 > width:
 			continue
 
+		txt_str = ''
+
 		# bug here.  the iteration is ending at 16 but should be ending at 8.
-		for h0 in range(height - step_size, 8, -step_size):
+		for h0 in range(step_size + 8, height - step_size, step_size):
 			h1 = h0 + step_size - 1
 			if h1 <= step_size + 8:
 				continue
 
 			# convert index to ascii character
-			txt_map += chr(convert_square_to_map_character(pixels, w0, h0, w1, h1))
+			txt_str += chr(convert_square_to_map_character(pixels, w0, h0, w1, h1))
 
-		txt_map += '\n'
+		# append reversed string of text with a new line to string representing the
+		# map. We reverse so the ground is at the beginning of the string rather 
+		# than the end
+		txt_map += txt_str[::-1] + '\n'
 
 	return txt_map
 
@@ -51,14 +56,12 @@ if __name__ == '__main__':
 	png_dir = '../levels/png/'
 	map_dir = '../levels/map/'
 
-	print convert_mario_png_to_map(png_dir + '1-1.png')
+	for png in tqdm(os.listdir(png_dir)):
+		result = convert_mario_png_to_map(png_dir + png)
 
-	# for png in tqdm(os.listdir(png_dir)):
-	# 	result = convert_mario_png_to_map(png_dir + png)
+		f = open(map_dir + png.replace('.png', '.map'), 'w')
+		f.write(result)
+		f.close()
 
-	# 	f = open(map_dir + png.replace('.png', '.map'), 'w')
-	# 	f.write(result)
-	# 	f.close()
-
-	# 	grid_values = {}
-	# 	index = 48
+		grid_values = {}
+		index = 48
