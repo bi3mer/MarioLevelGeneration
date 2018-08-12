@@ -25,6 +25,7 @@ Turns out that parsing png images isn't the easiest thing ever to get perfect. S
 | F    | flying platform     |
 | e    | plant enemy         |
 | S    | spring              |
+| b    | buzzy beatle        |
 
 
 # Removed

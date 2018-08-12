@@ -1,0 +1,57 @@
+{
+	"info": {
+		"types": ["enemy", "environment", "item"],
+		"x0": "starting x coordinate in sprite sheet",
+		"y0": "starting y coordinate in sprite sheet",
+		"info": "special information that will be in code rather than this config"
+	}, 
+	"src": {
+		":": {
+			"info": "do nothing, this is air"
+		},
+		"g": {
+			"type": 0,
+			"x0": 16,
+			"y0": 16
+		},
+		"|": {
+			"type": "env_tileset.png",
+			"x0": 0,
+			"y0": 0,
+			"info": "special case where it should write an extra 8 pixesl from the top of this"
+		},
+		"=": {
+			"type": "env_tileset.png",
+			"x0": 0,
+			"y0": 16
+		},
+		"p": {
+			"type": 1,
+			"bottom": {
+				"left": {
+					"x0": 0,
+					"y0": 144
+				},
+				"right": {
+					"x0": 16,
+					"y0": 144
+				}
+			}, 
+			"top": {
+				"left": {
+					"x0": 0,
+					"y0": 128
+				},
+				"right": {
+					"x0": 16,
+					"y0": 128
+				}
+			}		
+		},
+		"#": {
+			"type": 1,
+			"x0": 48,
+			"y0": 0
+		}
+	}
+}
