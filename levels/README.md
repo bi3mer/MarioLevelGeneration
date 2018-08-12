@@ -19,9 +19,12 @@ Turns out that parsing png images isn't the easiest thing ever to get perfect. S
 | f    | flag                |
 | c    | coin                |
 | f    | small castle (fort) |
+| B    | big castle          |
 | P    | platform bottom     |
 | T    | platform top        |
 | F    | flying platform     |
+| e    | plant enemy         |
+| S    | spring              |
 
 
 # Removed
