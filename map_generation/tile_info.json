@@ -15,15 +15,20 @@
 			"y0": 16
 		},
 		"|": {
-			"type": "env_tileset.png",
+			"type": 1,
 			"x0": 0,
 			"y0": 0,
 			"info": "special case where it should write an extra 8 pixesl from the top of this"
 		},
 		"=": {
-			"type": "env_tileset.png",
+			"type": 1,
 			"x0": 0,
 			"y0": 16
+		},
+		"?": {
+			"type": 1,
+			"x0": 384,
+			"y0": 0
 		},
 		"p": {
 			"type": 1,
@@ -50,7 +55,7 @@
 		},
 		"#": {
 			"type": 1,
-			"x0": 48,
+			"x0": 32,
 			"y0": 0
 		}
 	}

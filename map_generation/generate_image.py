@@ -28,7 +28,36 @@ def empty_default_image(im):
 
 	im.putdata(pixels)
 
-def draw_from_sprite_sheet(tile_sets, image, x0, y0, data):
+def draw_ground_bottom(image, env_tile_set, x0, y0, xt, yt):
+	'''
+	Loop through top half of ground and put it at the very bottom
+	of the iamge to handle special case of extra 8 pixels at the 
+	bottom of every mario map
+	'''
+	step_size = STEP_SIZE / 2
+
+	# we aren't modifying the pixels after the tiles x coordinates
+	y0 += STEP_SIZE
+
+	for y in xrange(step_size):
+		for x in xrange(STEP_SIZE):
+			pixel = env_tile_set.getpixel((xt + x, yt + y))
+			image.putpixel((x0+x, y0+y), pixel)
+
+
+def draw_from_sprite_sheet(tile_sets, image, x0, y0, data, tile):
+	if tile == ':':
+		# ignore air
+		return
+
+	if 'type' not in data:
+		print data 
+		return
+
+	if 'x0' not in data:
+		print data
+		return
+
 	tile_set = tile_sets[data['type']]
 
 	# tile set x and y positions
@@ -38,13 +67,14 @@ def draw_from_sprite_sheet(tile_sets, image, x0, y0, data):
 	# adjust coodrinates to image space
 	x0 *= STEP_SIZE
 	y0 *= STEP_SIZE
-	print x0,y0
 
 	# put pixels into image
 	for y in xrange(STEP_SIZE):
 		for x in xrange(STEP_SIZE):
 			pixel = tile_set.getpixel((xt + x, yt + y))
-			image.putpixel((x0-x,y0+y), pixel)
+			image.putpixel((x0+x, y0+y), pixel)
+
+	if tile == '|': draw_ground_bottom(image, tile_set, x0, y0, xt, yt)
 
 def pre_process_map(matrix):
 	'''
@@ -66,10 +96,10 @@ def create_tilesets():
 		2 = environment
 		3 = items
 	'''
-
-	env_sprite_sheet = Image.open('../assets/env_tileset.png')
+	env_sprite_sheet   = Image.open('../assets/env_tileset.png')
 	enemy_sprite_sheet = Image.open('../assets/enemy_tileset.png')
 	items_sprite_sheet = Image.open('../assets/items_objects_tileset.png')
+
 	return [enemy_sprite_sheet, env_sprite_sheet, items_sprite_sheet]
 
 def convert_map(map_str, display=True, save_path=None):
@@ -88,17 +118,21 @@ def convert_map(map_str, display=True, save_path=None):
 	len_column = len(lvl_map)
 	len_row = len(lvl_map[0])
 
-	height = len_column * STEP_SIZE
-	width = len_row * STEP_SIZE
+	# there are always 8 extra pixels in a mario level
+	height = len_row * STEP_SIZE + 8 
+	width = len_column * STEP_SIZE
 
-	im = Image.new('RGBA', (height, width))
+	im = Image.new('RGBA', (width, height))
 	empty_default_image(im)
 
 	for x in xrange(len_column):
 		for y in xrange(len_row):
 			tile = lvl_map[x][y]
+
 			if tile in data:
-				draw_from_sprite_sheet(tile_sets, im, x, len_row - y - 1, data[tile])
+				draw_from_sprite_sheet(tile_sets, im, x, len_row - y - 1, data[tile], tile)
+			else:
+				print 'Tile not found:', tile
 
 	if display:
 		im.show()
