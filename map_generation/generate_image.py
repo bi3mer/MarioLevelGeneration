@@ -44,18 +44,28 @@ def draw_ground_bottom(image, env_tile_set, x0, y0, xt, yt):
 			pixel = env_tile_set.getpixel((xt + x, yt + y))
 			image.putpixel((x0+x, y0+y), pixel)
 
+def parse_json_for_tile_info(data, tile):
+	tile_data = None
+	tile_length = len(tile)
+
+	if tile_length == 3:
+		tile_name = tile[0]
+		top_or_bottom = 'bottom' if tile[1] == 'b' else 'top'
+		left_or_right = 'left' if tile[2] == 'l' else 'right'
+		tile_data = data[tile_name][top_or_bottom][left_or_right]
+	elif tile_length == 1 and tile in data:
+		tile_data = data[tile]
+
+	return tile_data
 
 def draw_from_sprite_sheet(tile_sets, image, x0, y0, data, tile):
+	# ignore air
 	if tile == ':':
-		# ignore air
 		return
 
-	if 'type' not in data:
-		print data 
-		return
-
-	if 'x0' not in data:
-		print data
+	data = parse_json_for_tile_info(data, tile)
+	if data == None:
+		print 'Could not parse data for: ', tile
 		return
 
 	tile_set = tile_sets[data['type']]
@@ -74,6 +84,7 @@ def draw_from_sprite_sheet(tile_sets, image, x0, y0, data, tile):
 			pixel = tile_set.getpixel((xt + x, yt + y))
 			image.putpixel((x0+x, y0+y), pixel)
 
+	# handle special cases like the 8 pixels at the bottom of the ground
 	if tile == '|': draw_ground_bottom(image, tile_set, x0, y0, xt, yt)
 
 def pre_process_map(matrix):
@@ -86,7 +97,32 @@ def pre_process_map(matrix):
 	the defined behavior for these special characters to properly fill 
 	out the image
 	'''
-	pass
+	for i in xrange(len(matrix)):
+		column = list(matrix[i])
+
+		for j in xrange(len(column)):
+			tile = column[j]
+
+			if tile == 'p':
+				left_column = matrix[i-1]
+				if column[j + 1] == 'p':
+					if left_column[j] == 'pbl':
+						column[j] = 'pbr'
+					else:
+						column[j] = 'pbl'
+				else:
+					if left_column[j] == 'ptl':
+						column[j] = 'ptr'
+					else:
+						column[j] = 'ptl'
+			elif tile == 'f':
+				print 'flag is not yet handled'
+			elif tile == 'S':
+				print 'spring is not yet handled'
+
+		matrix[i] = column
+
+	print matrix
 
 def create_tilesets(): 
 	'''
@@ -128,17 +164,13 @@ def convert_map(map_str, display=True, save_path=None):
 	for x in xrange(len_column):
 		for y in xrange(len_row):
 			tile = lvl_map[x][y]
-
-			if tile in data:
-				draw_from_sprite_sheet(tile_sets, im, x, len_row - y - 1, data[tile], tile)
-			else:
-				print 'Tile not found:', tile
+			draw_from_sprite_sheet(tile_sets, im, x, len_row - y - 1, data, tile)
 
 	if display:
 		im.show()
 
 	if save_path != None and save_path != "":
-		im.save_path(save_path)
+		im.save(save_path)
 
 if __name__ == '__main__':
 	f = open('../levels/cleaned_maps/1-1.map', 'r')
@@ -146,3 +178,4 @@ if __name__ == '__main__':
 	f.close()
 
 	convert_map(map_text)
+	# convert_map(map_text, display=False, save_path='../screenshots/sample_incomplete_map_generation_form_1_1.png')
