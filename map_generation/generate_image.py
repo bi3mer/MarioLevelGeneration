@@ -3,6 +3,9 @@ import json
 
 STEP_SIZE = 16
 
+flag_x = 0
+flag_y = 0
+
 def build_json():
 	'''
 	read in the json file for the tile info and return the src portion
@@ -44,44 +47,43 @@ def draw_ground_bottom(image, env_tile_set, x0, y0, xt, yt):
 			pixel = env_tile_set.getpixel((xt + x, yt + y))
 			image.putpixel((x0+x, y0+y), pixel)
 
-def parse_json_for_tile_info(data, tile):
-	tile_data = None
-	tile_length = len(tile)
-
-	if tile_length == 3:
-		tile_name = tile[0]
-		top_or_bottom = 'bottom' if tile[1] == 'b' else 'top'
-		left_or_right = 'left' if tile[2] == 'l' else 'right'
-		tile_data = data[tile_name][top_or_bottom][left_or_right]
-	elif tile_length == 1 and tile in data:
-		tile_data = data[tile]
-
-	return tile_data
-
 def draw_from_sprite_sheet(tile_sets, image, x0, y0, data, tile):
+	global flag_x
+	global flag_y
+
 	# ignore air
 	if tile == ':':
 		return
 
-	data = parse_json_for_tile_info(data, tile)
-	if data == None:
+	if tile not in data: 
 		print 'Could not parse data for: ', tile
 		return
 
+	data = data[tile]
 	tile_set = tile_sets[data['type']]
 
 	# tile set x and y positions
 	xt = data['x0']
 	yt = data['y0']
 
+	# render the flag last
+	if tile == 'flag' and flag_x == 0 and flag_y == 0:
+		flag_x = x0
+		flag_y = y0
+		return
+
 	# adjust coodrinates to image space
 	x0 *= STEP_SIZE
 	y0 *= STEP_SIZE
 
+	# adjust x0 for flag
+	if tile == 'flag':
+		x0 += 8
+
 	# put pixels into image
 	for y in xrange(STEP_SIZE):
 		for x in xrange(STEP_SIZE):
-			pixel = tile_set.getpixel((xt + x, yt + y))
+			pixel = tile_set.getpixel((xt+x, yt+y))
 			image.putpixel((x0+x, y0+y), pixel)
 
 	# handle special cases like the 8 pixels at the bottom of the ground
@@ -116,13 +118,17 @@ def pre_process_map(matrix):
 					else:
 						column[j] = 'ptl'
 			elif tile == 'f':
-				print 'flag is not yet handled'
+				if column[j - 1] == '|':
+					column[j] = '='
+				elif j == len(column) - 2:
+					column[j] = 'flag_pole_top'
+				elif i + 2 == len(matrix):
+					column[j] = 'flag'
+				
 			elif tile == 'S':
 				print 'spring is not yet handled'
 
 		matrix[i] = column
-
-	print matrix
 
 def create_tilesets(): 
 	'''
@@ -165,6 +171,11 @@ def convert_map(map_str, display=True, save_path=None):
 		for y in xrange(len_row):
 			tile = lvl_map[x][y]
 			draw_from_sprite_sheet(tile_sets, im, x, len_row - y - 1, data, tile)
+
+	# the flag has to be rendered last else there will be ordering issues
+	print flag_x, flag_y
+	print im.size
+	draw_from_sprite_sheet(tile_sets, im, flag_x, flag_y, data, 'flag')
 
 	if display:
 		im.show()
