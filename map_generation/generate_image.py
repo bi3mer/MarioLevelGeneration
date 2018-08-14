@@ -1,3 +1,8 @@
+'''
+@note: I'm not attempting to make this code clean or good, just functional
+       beacuse this will never be used extensively or have to be re-written.
+'''
+
 from PIL import Image, ImageDraw
 import json
 
@@ -59,12 +64,12 @@ def draw_from_sprite_sheet(tile_sets, image, x0, y0, data, tile):
 		print 'Could not parse data for: ', tile
 		return
 
-	data = data[tile]
-	tile_set = tile_sets[data['type']]
+	tile_data = data[tile]
+	tile_set = tile_sets[tile_data['type']]
 
 	# tile set x and y positions
-	xt = data['x0']
-	yt = data['y0']
+	xt = tile_data['x0']
+	yt = tile_data['y0']
 
 	# render the flag last
 	if tile == 'flag' and flag_x == 0 and flag_y == 0:
@@ -83,9 +88,9 @@ def draw_from_sprite_sheet(tile_sets, image, x0, y0, data, tile):
 	# put pixels into image
 	y_step_size = STEP_SIZE
 	x_step_size = STEP_SIZE
-	if 'extra' in data:
-		y_step_size += data['extra']
-		y0 -= data['extra']
+	if 'extra' in tile_data:
+		y_step_size += tile_data['extra']
+		y0 -= tile_data['extra']
 
 	for y in xrange(y_step_size):
 		for x in xrange(x_step_size):
@@ -93,7 +98,11 @@ def draw_from_sprite_sheet(tile_sets, image, x0, y0, data, tile):
 			image.putpixel((x0+x, y0+y), pixel)
 
 	# handle special cases like the 8 pixels at the bottom of the ground
-	if tile == '|': draw_ground_bottom(image, tile_set, x0, y0, xt, yt)
+	if tile == '|':
+		draw_ground_bottom(image, tile_set, x0, y0, xt, yt)
+	elif tile == 'TM':
+		data = data['P']
+		draw_ground_bottom(image, tile_set, x0, y0, data['x0'], data['y0'])
 
 def pre_process_map(matrix):
 	'''
@@ -110,7 +119,7 @@ def pre_process_map(matrix):
 
 		for j in xrange(len(column)):
 			tile = column[j]
-
+			
 			if tile == 'p':
 				left_column = matrix[i-1]
 				if column[j + 1] == 'p':
@@ -130,9 +139,16 @@ def pre_process_map(matrix):
 					column[j] = 'flag_pole_top'
 				elif i + 2 == len(matrix):
 					column[j] = 'flag'
-				
-			elif tile == 'S':
-				print 'spring is not yet handled'
+			elif tile == 'T': 
+				left_column = matrix[i-1]
+				right_column = matrix[i+1]
+
+				if 'T' not in left_column[j]:
+					column[j] = 'TL'
+				elif left_column[j] == 'TL' or right_column[j] == 'T':
+					column[j] = 'TM'
+				else:
+					column[j] = 'TR'
 
 		matrix[i] = column
 
@@ -188,9 +204,9 @@ def convert_map(map_str, display=True, save_path=None):
 		im.save(save_path)
 
 if __name__ == '__main__':
-	f = open('../levels/cleaned_maps/1-1.map', 'r')
+	f = open('../levels/cleaned_maps/2-1.map', 'r')
 	map_text = f.read()
 	f.close()
 
-	# convert_map(map_text)
-	convert_map(map_text, display=False, save_path='../screenshots/sample_complete_map_generation_form_1_1.png')
+	convert_map(map_text)
+	# convert_map(map_text, display=False, save_path='../screenshots/sample_complete_map_generation_form_1_1.png')
