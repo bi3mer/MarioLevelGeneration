@@ -81,8 +81,14 @@ def draw_from_sprite_sheet(tile_sets, image, x0, y0, data, tile):
 		x0 += 8
 
 	# put pixels into image
-	for y in xrange(STEP_SIZE):
-		for x in xrange(STEP_SIZE):
+	y_step_size = STEP_SIZE
+	x_step_size = STEP_SIZE
+	if 'extra' in data:
+		y_step_size += data['extra']
+		y0 -= data['extra']
+
+	for y in xrange(y_step_size):
+		for x in xrange(x_step_size):
 			pixel = tile_set.getpixel((xt+x, yt+y))
 			image.putpixel((x0+x, y0+y), pixel)
 
@@ -173,8 +179,6 @@ def convert_map(map_str, display=True, save_path=None):
 			draw_from_sprite_sheet(tile_sets, im, x, len_row - y - 1, data, tile)
 
 	# the flag has to be rendered last else there will be ordering issues
-	print flag_x, flag_y
-	print im.size
 	draw_from_sprite_sheet(tile_sets, im, flag_x, flag_y, data, 'flag')
 
 	if display:
@@ -188,5 +192,5 @@ if __name__ == '__main__':
 	map_text = f.read()
 	f.close()
 
-	convert_map(map_text)
-	# convert_map(map_text, display=False, save_path='../screenshots/sample_incomplete_map_generation_form_1_1.png')
+	# convert_map(map_text)
+	convert_map(map_text, display=False, save_path='../screenshots/sample_complete_map_generation_form_1_1.png')
