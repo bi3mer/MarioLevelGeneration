@@ -61,7 +61,7 @@ def draw_from_sprite_sheet(tile_sets, image, x0, y0, data, tile):
 		return
 
 	if tile not in data: 
-		print 'Could not parse data for: ', tile
+		print 'Could not parse data for (%i, %i): %s' % (x0, y0, tile)
 		return
 
 	tile_data = data[tile]
@@ -158,11 +158,16 @@ def pre_process_map(matrix):
 					column[j] = 'TM'
 				else:
 					column[j] = 'TR'
-			if tile == 'e':
+			elif tile == 'e':
 				if left_column[j] == 'el':
 					column[j] = 'er'
 				else:
 					column[j] = 'el'
+			elif tile == 'S':
+				if 's' in column[j-1]:
+					column[j] = 'st'
+				else:
+					column[j] = 'sb'
 
 		matrix[i] = column
 
