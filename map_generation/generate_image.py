@@ -92,6 +92,15 @@ def draw_from_sprite_sheet(tile_sets, image, x0, y0, data, tile):
 		y_step_size += tile_data['extra']
 		y0 -= tile_data['extra']
 
+	if 'reduce_x_right' in tile_data:
+		x = tile_data['reduce_x_right']
+		x0 += x
+		x_step_size -= x
+	elif 'reduce_x_left' in tile_data:
+		x = tile_data['reduce_x_left']
+		xt += x
+		x_step_size -=x
+
 	for y in xrange(y_step_size):
 		for x in xrange(x_step_size):
 			pixel = tile_set.getpixel((xt+x, yt+y))
@@ -149,6 +158,11 @@ def pre_process_map(matrix):
 					column[j] = 'TM'
 				else:
 					column[j] = 'TR'
+			if tile == 'e':
+				if left_column[j] == 'el':
+					column[j] = 'er'
+				else:
+					column[j] = 'el'
 
 		matrix[i] = column
 

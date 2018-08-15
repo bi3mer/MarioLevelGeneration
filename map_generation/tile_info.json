@@ -115,6 +115,20 @@
 			"type": 1,
 			"x0": 80,
 			"y0": 16
+		},
+		"el": {
+			"type": 0,
+			"x0": 192,
+			"y0": 8,
+			"extra": 8,
+			"reduce_x_right": 8
+		},
+		"er": {
+			"type": 0,
+			"x0": 192,
+			"y0": 8,
+			"extra": 8,
+			"reduce_x_left": 8
 		}
 	}
 }
