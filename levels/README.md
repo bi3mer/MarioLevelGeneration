@@ -26,6 +26,8 @@ Turns out that parsing png images isn't the easiest thing ever to get perfect. S
 | e    | plant enemy         |
 | S    | spring              |
 | b    | buzzy beatle        |
+| C    | Cheep Cheep         |
+| w    | weird plaftform 2-3 |
 
 
 # Removed
