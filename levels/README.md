@@ -28,6 +28,8 @@ Turns out that parsing png images isn't the easiest thing ever to get perfect. S
 | b    | buzzy beatle        |
 | C    | Cheep Cheep         |
 | w    | weird plaftform 2-3 |
+| R    | red coin            |
+| r    | red shell           |
 
 
 # Removed
