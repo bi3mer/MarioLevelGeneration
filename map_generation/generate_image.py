@@ -171,6 +171,8 @@ def pre_process_map(matrix):
 			elif tile == 'z':
 				if tile in column[j-1]:
 					column[j] = 'zt'
+				elif tile not in column[j+1]:
+					column[j] = 'zt'
 				else:
 					column[j] = 'zb'
 			elif tile == 'Z':
@@ -235,7 +237,7 @@ def convert_map(map_str, display=True, save_path=None):
 		im.save(save_path)
 
 if __name__ == '__main__':
-	f = open('../levels/cleaned_maps/8-1.map', 'r')
+	f = open('../levels/cleaned_maps/8-2.map', 'r')
 	map_text = f.read()
 	f.close()
 
