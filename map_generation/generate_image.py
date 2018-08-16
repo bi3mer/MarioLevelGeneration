@@ -237,7 +237,7 @@ def convert_map(map_str, display=True, save_path=None):
 		im.save(save_path)
 
 if __name__ == '__main__':
-	f = open('../levels/cleaned_maps/8-2.map', 'r')
+	f = open('../levels/cleaned_maps/8-3.map', 'r')
 	map_text = f.read()
 	f.close()
 
