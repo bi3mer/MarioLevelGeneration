@@ -144,10 +144,10 @@ def pre_process_map(matrix):
 			elif tile == 'f':
 				if column[j - 1] == '|':
 					column[j] = '='
-				elif j == len(column) - 2:
-					column[j] = 'flag_pole_top'
 				elif i + 2 == len(matrix):
 					column[j] = 'flag'
+				elif j == len(column) - 1:
+					column[j] = 'flag_pole_top'
 			elif tile == 'T': 
 				left_column = matrix[i-1]
 				right_column = matrix[i+1]
@@ -228,7 +228,7 @@ def convert_map(map_str, display=True, save_path=None):
 		im.save(save_path)
 
 if __name__ == '__main__':
-	f = open('../levels/cleaned_maps/5-2.map', 'r')
+	f = open('../levels/cleaned_maps/5-3.map', 'r')
 	map_text = f.read()
 	f.close()
 
