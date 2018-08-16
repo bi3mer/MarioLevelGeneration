@@ -168,6 +168,11 @@ def pre_process_map(matrix):
 					column[j] = 'st'
 				else:
 					column[j] = 'sb'
+			elif tile == 'z' or tile == 'Z':
+				if tile in column[j-1]:
+					column[j] = '%st' % (tile)
+				else:
+					column[j] = '%sb' % (tile)
 
 		matrix[i] = column
 
@@ -223,7 +228,7 @@ def convert_map(map_str, display=True, save_path=None):
 		im.save(save_path)
 
 if __name__ == '__main__':
-	f = open('../levels/cleaned_maps/4-1.map', 'r')
+	f = open('../levels/cleaned_maps/5-1.map', 'r')
 	map_text = f.read()
 	f.close()
 
