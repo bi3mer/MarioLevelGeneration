@@ -17,7 +17,12 @@ def build_json():
 	as the info section is only useful for people trying to learn how 
 	this code base will work	
 	'''
-	f = open('tile_info.json')
+	f = None
+
+	if __name__ == '__main':
+		f = open('tile_info.json')
+	else:
+		f = open('map_generation/tile_info.json')
 	data = json.load(f)
 	f.close()
 
@@ -30,8 +35,8 @@ def empty_default_image(im):
 	w,h = im.size
 
 	pixels = []
-	for x in xrange(w):
-		for y in xrange(h):
+	for x in range(w):
+		for y in range(h):
 			pixels.append((0,0,0,0))
 
 	im.putdata(pixels)
@@ -42,13 +47,13 @@ def draw_ground_bottom(image, env_tile_set, x0, y0, xt, yt):
 	of the iamge to handle special case of extra 8 pixels at the 
 	bottom of every mario map
 	'''
-	step_size = STEP_SIZE / 2
+	step_size = int(STEP_SIZE / 2)
 
 	# we aren't modifying the pixels after the tiles x coordinates
 	y0 += STEP_SIZE
 
-	for y in xrange(step_size):
-		for x in xrange(STEP_SIZE):
+	for y in range(step_size):
+		for x in range(STEP_SIZE):
 			pixel = env_tile_set.getpixel((xt + x, yt + y))
 			image.putpixel((x0+x, y0+y), pixel)
 
@@ -61,7 +66,7 @@ def draw_from_sprite_sheet(tile_sets, image, x0, y0, data, tile):
 		return
 
 	if tile not in data: 
-		print 'Could not parse data for (%i, %i): %s' % (x0, y0, tile)
+		print('Could not parse data for (%i, %i): %s' % (x0, y0, tile))
 		return
 
 	tile_data = data[tile]
@@ -101,8 +106,8 @@ def draw_from_sprite_sheet(tile_sets, image, x0, y0, data, tile):
 		xt += x
 		x_step_size -=x
 
-	for y in xrange(y_step_size):
-		for x in xrange(x_step_size):
+	for y in range(y_step_size):
+		for x in range(x_step_size):
 			pixel = tile_set.getpixel((xt+x, yt+y))
 			image.putpixel((x0+x, y0+y), pixel)
 
@@ -123,10 +128,10 @@ def pre_process_map(matrix):
 	the defined behavior for these special characters to properly fill 
 	out the image
 	'''
-	for i in xrange(len(matrix)):
+	for i in range(len(matrix)):
 		column = list(matrix[i])
 
-		for j in xrange(len(column)):
+		for j in range(len(column)):
 			tile = column[j]
 			
 			if tile == 'p':
@@ -193,9 +198,18 @@ def create_tilesets():
 		2 = environment
 		3 = items
 	'''
-	env_sprite_sheet   = Image.open('../assets/env_tileset.png')
-	enemy_sprite_sheet = Image.open('../assets/enemy_tileset.png')
-	items_sprite_sheet = Image.open('../assets/items_objects_tileset.png')
+	env_sprite_sheet = None
+	enemy_sprite_sheet = None
+	items_sprite_sheet = None
+    
+	if __name__ == '__main':
+		env_sprite_sheet   = Image.open('../assets/env_tileset.png')
+		enemy_sprite_sheet = Image.open('../assets/enemy_tileset.png')
+		items_sprite_sheet = Image.open('../assets/items_objects_tileset.png')
+	else: 
+		env_sprite_sheet   = Image.open('assets/env_tileset.png')
+		enemy_sprite_sheet = Image.open('assets/enemy_tileset.png')
+		items_sprite_sheet = Image.open('assets/items_objects_tileset.png')
 
 	return [enemy_sprite_sheet, env_sprite_sheet, items_sprite_sheet]
 
@@ -222,8 +236,8 @@ def convert_map(map_str, display=True, save_path=None):
 	im = Image.new('RGBA', (width, height))
 	empty_default_image(im)
 
-	for x in xrange(len_column):
-		for y in xrange(len_row):
+	for x in range(len_column):
+		for y in range(len_row):
 			tile = lvl_map[x][y]
 			draw_from_sprite_sheet(tile_sets, im, x, len_row - y - 1, data, tile)
 
