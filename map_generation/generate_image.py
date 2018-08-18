@@ -114,7 +114,7 @@ def draw_from_sprite_sheet(tile_sets, image, x0, y0, data, tile):
 	# handle special cases like the 8 pixels at the bottom of the ground
 	if tile == '|':
 		draw_ground_bottom(image, tile_set, x0, y0, xt, yt)
-	elif tile == 'TM':
+	elif tile == 'TM' or tile == 'P':
 		data = data['P']
 		draw_ground_bottom(image, tile_set, x0, y0, data['x0'], data['y0'])
 
