@@ -19,7 +19,7 @@ def build_json():
 	'''
 	f = None
 
-	if __name__ == '__main':
+	if __name__ == '__main__':
 		f = open('tile_info.json')
 	else:
 		f = open('map_generation/tile_info.json')
@@ -202,7 +202,7 @@ def create_tilesets():
 	enemy_sprite_sheet = None
 	items_sprite_sheet = None
     
-	if __name__ == '__main':
+	if __name__ == '__main__':
 		env_sprite_sheet   = Image.open('../assets/env_tileset.png')
 		enemy_sprite_sheet = Image.open('../assets/enemy_tileset.png')
 		items_sprite_sheet = Image.open('../assets/items_objects_tileset.png')
@@ -251,7 +251,7 @@ def convert_map(map_str, display=True, save_path=None):
 		im.save(save_path)
 
 if __name__ == '__main__':
-	f = open('../levels/cleaned_maps/8-3.map', 'r')
+	f = open('../levels/test_sample.map', 'r')
 	map_text = f.read()
 	f.close()
 
