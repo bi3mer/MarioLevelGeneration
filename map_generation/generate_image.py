@@ -57,7 +57,7 @@ def draw_ground_bottom(image, env_tile_set, x0, y0, xt, yt):
 			pixel = env_tile_set.getpixel((xt + x, yt + y))
 			image.putpixel((x0+x, y0+y), pixel)
 
-def draw_from_sprite_sheet(tile_sets, image, x0, y0, data, tile):
+def draw_from_sprite_sheet(tile_sets, image, x0, y0, data, tile, is_bottom):
 	global flag_x
 	global flag_y
 
@@ -112,11 +112,12 @@ def draw_from_sprite_sheet(tile_sets, image, x0, y0, data, tile):
 			image.putpixel((x0+x, y0+y), pixel)
 
 	# handle special cases like the 8 pixels at the bottom of the ground
-	if tile == '|':
-		draw_ground_bottom(image, tile_set, x0, y0, xt, yt)
-	elif tile == 'TM' or tile == 'P':
-		data = data['P']
-		draw_ground_bottom(image, tile_set, x0, y0, data['x0'], data['y0'])
+	if is_bottom:
+		if tile == '|':
+			draw_ground_bottom(image, tile_set, x0, y0, xt, yt)
+		elif tile == 'TM' or tile == 'P':
+			data = data['P']
+			draw_ground_bottom(image, tile_set, x0, y0, data['x0'], data['y0'])
 
 def pre_process_map(matrix):
 	'''
@@ -241,10 +242,10 @@ def convert_map(map_str, display=True, save_path=None):
 	for x in range(len_column):
 		for y in range(len_row):
 			tile = lvl_map[x][y]
-			draw_from_sprite_sheet(tile_sets, im, x, len_row - y - 1, data, tile)
+			draw_from_sprite_sheet(tile_sets, im, x, len_row - y - 1, data, tile, y == 0)
 
 	# the flag has to be rendered last else there will be ordering issues
-	draw_from_sprite_sheet(tile_sets, im, flag_x, flag_y, data, 'flag')
+	draw_from_sprite_sheet(tile_sets, im, flag_x, flag_y, data, 'flag', False)
 	flag_x = 0
 	flag_y = 0
 
