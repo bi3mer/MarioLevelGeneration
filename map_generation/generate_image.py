@@ -220,6 +220,8 @@ def convert_map(map_str, display=True, save_path=None):
 	- Set save_path to a string for this function to save the image. 
 	- Set Display to Falseto not display the map on conversion completion
 	'''
+	global flag_x
+	global flag_y
 	tile_sets = create_tilesets()
 
 	data = build_json()
@@ -243,6 +245,8 @@ def convert_map(map_str, display=True, save_path=None):
 
 	# the flag has to be rendered last else there will be ordering issues
 	draw_from_sprite_sheet(tile_sets, im, flag_x, flag_y, data, 'flag')
+	flag_x = 0
+	flag_y = 0
 
 	if display:
 		im.show()
