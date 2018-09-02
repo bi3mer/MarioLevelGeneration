@@ -129,9 +129,12 @@ def pre_process_map(matrix):
 	the defined behavior for these special characters to properly fill 
 	out the image
 	'''
-	for i in range(len(matrix)):
-		column = list(matrix[i])
-
+	length = len(matrix)
+	for i in range(length):
+		matrix[i] = matrix[i].split(',')
+   
+	for i in range(length):
+		column = matrix[i]
 		for j in range(len(column)):
 			tile = column[j]
 			
