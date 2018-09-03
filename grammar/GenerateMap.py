@@ -1,7 +1,7 @@
 import random
 
-END_GRAMMAR   = '36'
-FLAG_GRAMMAR  = '35'
+END_GRAMMAR   = '49'
+FLAG_GRAMMAR  = '48'
 START_GRAMMAR = '0'
 
 # @note: could be improved to reduce duplicate code 
