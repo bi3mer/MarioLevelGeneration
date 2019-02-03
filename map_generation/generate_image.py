@@ -9,7 +9,6 @@ import json
 STEP_SIZE = 16
 
 flag_x = 0
-flag_y = 0
 
 def build_json():
 	'''
@@ -59,7 +58,6 @@ def draw_ground_bottom(image, env_tile_set, x0, y0, xt, yt):
 
 def draw_from_sprite_sheet(tile_sets, image, x0, y0, data, tile, is_bottom):
 	global flag_x
-	global flag_y
 
 	# ignore air
 	if tile == ':':
@@ -77,9 +75,8 @@ def draw_from_sprite_sheet(tile_sets, image, x0, y0, data, tile, is_bottom):
 	yt = tile_data['y0']
 
 	# render the flag last
-	if tile == 'flag' and flag_x == 0 and flag_y == 0:
+	if tile == 'flag' and flag_x == 0:
 		flag_x = x0
-		flag_y = y0
 		return
 
 	# adjust coodrinates to image space
@@ -107,7 +104,12 @@ def draw_from_sprite_sheet(tile_sets, image, x0, y0, data, tile, is_bottom):
 		x_step_size -=x
 
 	for y in range(y_step_size):
+		if tile == 'flag':
+			print(y)
+
 		for x in range(x_step_size):
+			if tile == 'flag':
+				print(x0 + x)
 			pixel = tile_set.getpixel((xt+x, yt+y))
 			image.putpixel((x0+x, y0+y), pixel)
 
@@ -225,7 +227,6 @@ def convert_map(map_str, display=True, save_path=None):
 	- Set Display to Falseto not display the map on conversion completion
 	'''
 	global flag_x
-	global flag_y
 	tile_sets = create_tilesets()
 
 	data = build_json()
@@ -248,9 +249,8 @@ def convert_map(map_str, display=True, save_path=None):
 			draw_from_sprite_sheet(tile_sets, im, x, len_row - y - 1, data, tile, y == 0)
 
 	# the flag has to be rendered last else there will be ordering issues
-	draw_from_sprite_sheet(tile_sets, im, flag_x, flag_y, data, 'flag', False)
+	# draw_from_sprite_sheet(tile_sets, im, flag_x, 0, data, 'flag', False)
 	flag_x = 0
-	flag_y = 0
 
 	if display:
 		im.show()

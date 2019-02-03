@@ -37,8 +37,8 @@ def build_grammars_and_mappings(max_grammar_length=4):
 			# and if not we added to our dictionaries for mapping
 			column = ','.join(column)
 			if column not in column_to_index:
-				index_to_column[index] = column
-				column_to_index[column] = index
+				index_to_column[str(index)] = column
+				column_to_index[column] = str(index)
 
 				index += 1
 
@@ -80,6 +80,3 @@ def convert_counted_grammar_to_percentages(grammar, size):
 			new_grammar[input_column][output_index] = grammar[input_column][output_index] / total_amount
 		
 	return new_grammar
-
-grammars, index_to_column, column_to_index = build_grammars_and_mappings()
-convert_counted_grammar_to_percentages(grammars[3], 3)
