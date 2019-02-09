@@ -9,7 +9,7 @@ import sys
 
 def build_maps(
 	weighted_grammars, index_to_column, seed, min_map_length, use_random_selection, 
-	start_index, flag_index, end_index, store_maps, display):
+	start_index, flag_index, end_index, store_maps, display_png, display_ascii):
 
 	print('generating maps')
 	for i in tqdm(range(len(weighted_grammars)), ascii=True):
@@ -26,7 +26,11 @@ def build_maps(
 			else:
 				save_path = f'screenshots/weighted_grammar_{i+1}.png'
 
-		generate_image.convert_map(map_text, display=display, save_path=save_path)
+		generate_image.convert_map(map_text, display_png=display_png, save_path=save_path)
+
+		if display_ascii:
+			print(f'Grammar Size: {i}')
+			print(map_text)
 
 def build_arg_parser():
 	parser = argparse.ArgumentParser(description="BGC ApiGateway Helper")
@@ -46,6 +50,7 @@ def build_arg_parser():
 	parser.add_argument('--max-grammar-length', type=int, help='define max grammar length used in generated maps')
 	parser.add_argument('--save', action='store_true', help='flag to save images in screenshots directory')
 	parser.add_argument('--display-images', action='store_true', help='flag to view images after generation')
+	parser.add_argument('--display-ascii', action='store_true', help='flag to view ascii version of images after generation')
 
 	return parser.parse_args()
 
@@ -84,12 +89,14 @@ if __name__ == '__main__':
 	if parser.generate_weighted_maps:
 		build_maps(
 			weighted_grammars, index_to_column, seed, min_map_length, False, 
-			start_index, flag_index, end_index, parser.save, parser.display_images)
+			start_index, flag_index, end_index, parser.save, parser.display_images,
+			parser.display_ascii)
 
 	if parser.generate_random_maps:
 		build_maps(
 			weighted_grammars, index_to_column, seed, min_map_length, True, 
-			start_index, flag_index, end_index, parser.save, parser.display_images)
+			start_index, flag_index, end_index, parser.save, parser.display_images,
+			parser.display_ascii)
 
 
 

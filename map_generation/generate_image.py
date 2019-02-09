@@ -219,7 +219,7 @@ def create_tilesets():
 
 	return [enemy_sprite_sheet, env_sprite_sheet, items_sprite_sheet]
 
-def convert_map(map_str, display=True, save_path=None):
+def convert_map(map_str, display_png=True, save_path=None):
 	'''
 	convert a string of a mario map into an image. 
 
@@ -252,7 +252,7 @@ def convert_map(map_str, display=True, save_path=None):
 	# draw_from_sprite_sheet(tile_sets, im, flag_x, 0, data, 'flag', False)
 	flag_x = 0
 
-	if display:
+	if display_png:
 		im.show()
 
 	if save_path != None and save_path != "":
