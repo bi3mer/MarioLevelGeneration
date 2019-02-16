@@ -7,9 +7,20 @@ import argparse
 import Grammar
 import sys
 
+def define_map_key_indexes(column_to_index):
+	# depending on parsing order, these indexes may change but the hardcoded
+	# strings will not unless the entire dataset is change to support VGLC
+	start_index = column_to_index['|,:,:,:,:,:,:,:,:,:,:,:']
+	flag_index = column_to_index['|,:,:,:,:,:,:,:,:,:,flag,:']
+	end_index = column_to_index['|,=,f,f,f,f,f,f,f,f,f,flag_pole_top']
+
+	return start_index, flag_index, end_index
+
 def build_maps(
-	weighted_grammars, index_to_column, seed, min_map_length, use_random_selection, 
-	start_index, flag_index, end_index, store_maps, display_png, display_ascii):
+	weighted_grammars, index_to_column, column_to_index, seed, min_map_length, 
+	use_random_selection, store_maps, display_png, display_ascii):
+
+	start_index, flag_index, end_index = define_map_key_indexes(column_to_index)
 
 	print('generating maps')
 	for i in tqdm(range(len(weighted_grammars)), ascii=True):
@@ -72,6 +83,15 @@ def define_configuration(parser):
 
 	return min_map_length, seed, grammar_count
 
+def build_grammar_info(min_grammar_size, max_grammar_size):
+	grammars, index_to_column, column_to_index = Grammar.build_grammars_and_mappings(max_grammar_length=max_grammar_size)
+	
+	weighted_grammars = []
+	for i in range(min_grammar_size, max_grammar_size):
+		weighted_grammars.append(Grammar.convert_counted_grammar_to_percentages(grammars[i], i))
+
+	return grammars, index_to_column, column_to_index, weighted_grammars
+
 if __name__ == '__main__':
 	parser = build_arg_parser()
 
@@ -80,26 +100,17 @@ if __name__ == '__main__':
 		sys.exit(0)
 
 	min_map_length, seed, grammar_count = define_configuration(parser)
-	grammars, index_to_column, column_to_index = Grammar.build_grammars_and_mappings(max_grammar_length=grammar_count)
-	weighted_grammars = [Grammar.convert_counted_grammar_to_percentages(grammars[i], i) for i in range(grammar_count)]
-
-	# depending on parsing order, these indexes may change but the hardcoded
-	# strings will not unless the entire dataset is change to support VGLC
-	start_index = column_to_index['|,:,:,:,:,:,:,:,:,:,:,:']
-	flag_index = column_to_index['|,:,:,:,:,:,:,:,:,:,flag,:']
-	end_index = column_to_index['|,=,f,f,f,f,f,f,f,f,f,flag_pole_top']
+	grammars, index_to_column, column_to_index, weighted_grammars = build_grammar_info(0, grammar_count)
 
 	if parser.generate_weighted_maps:
 		build_maps(
-			weighted_grammars, index_to_column, seed, min_map_length, False, 
-			start_index, flag_index, end_index, parser.save, parser.display_images,
-			parser.display_ascii)
+			weighted_grammars, index_to_column, column_to_index, seed, min_map_length, False, 
+			parser.save, parser.display_images, parser.display_ascii)
 
 	if parser.generate_random_maps:
 		build_maps(
-			weighted_grammars, index_to_column, seed, min_map_length, True, 
-			start_index, flag_index, end_index, parser.save, parser.display_images,
-			parser.display_ascii)
+			weighted_grammars, index_to_column, column_to_index, seed, min_map_length, True, 
+			parser.save, parser.display_images, parser.display_ascii)
 
 
 

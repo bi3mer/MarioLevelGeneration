@@ -4,12 +4,15 @@ from tqdm import tqdm
 
 import ExpressiveRange
 import GenerateMap
+import generator
 import argparse
 import Grammar
 import sys
 
 def build_arg_parser():
 	parser = argparse.ArgumentParser(description="Mario NGram Generation")
+
+	parser.add_argument('--grammar-size', type=int, help='REQUIRED: size of grammar being used', required=True)
 
 	parser.add_argument('--grammar-name', type=str, help='name of grammar to be stored')
 	parser.add_argument('--max-iterations', type=int, help='maximum number of iterations for rl process')
@@ -31,11 +34,17 @@ def validate_float_argument(expressive_type, val, targets):
 
 	targets[expressive_type] = val
 
-def rl(target_file_name, max_iterations, targets):
+def rl(target_file_name, max_iterations, grammar_size, targets):
 	print(target_file_name)
 	print(max_iterations)
 	print(targets)
 
+	grammars, index_to_column, column_to_index, weighted_grammars = generator.build_grammar_info(
+		grammar_size,
+		grammar_size)
+
+	grammar = grammars[grammar_size - 1]
+	print(grammar)
 
 if __name__ == '__main__':
 	args = build_arg_parser()
@@ -62,6 +71,10 @@ if __name__ == '__main__':
 		print('--grammar-name must specify file name ending with ".json"')
 		sys.exit(0)
 
-	rl(target_file_name, max_iterations, targets)
+	grammar_size = args.grammar_size
+	if grammar_size <= 0 or grammar_size >= 10:
+		print('--grammar-size must be greater than 0 and less than 10')
+		sys.exit(0)
 
-	
+	rl(target_file_name, max_iterations, grammar_size, targets)
+
