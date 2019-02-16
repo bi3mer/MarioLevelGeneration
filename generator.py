@@ -31,9 +31,11 @@ def build_maps(
 		if display_ascii:
 			print(f'Grammar Size: {i}')
 			print(map_text)
+			# print(ExpressiveRange.linearity(map_text.strip().split('\n')))
+			# print(map_text.strip().split('\n'))
 
 def build_arg_parser():
-	parser = argparse.ArgumentParser(description="BGC ApiGateway Helper")
+	parser = argparse.ArgumentParser(description="Mario NGram Level Generation")
 
 	parser.add_argument(
 		'--generate-weighted-maps', 
@@ -51,6 +53,7 @@ def build_arg_parser():
 	parser.add_argument('--save', action='store_true', help='flag to save images in screenshots directory')
 	parser.add_argument('--display-images', action='store_true', help='flag to view images after generation')
 	parser.add_argument('--display-ascii', action='store_true', help='flag to view ascii version of images after generation')
+	parser.add_argument('--read-grammar', type=str, help='file path to grammar built from rl.py')
 
 	return parser.parse_args()
 
