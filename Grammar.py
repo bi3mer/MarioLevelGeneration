@@ -49,7 +49,7 @@ def build_grammars_and_mappings(max_grammar_length=4):
 				if len(grammar_context_queue) == grammar_context_queue.maxlen:
 					grammar_context = ','.join([str(j) for j in grammar_context_queue])
 
-					if grammar_context not in  grammars[i]:
+					if grammar_context not in grammars[i]:
 						grammars[i][grammar_context] = {}
 
 					if column_index not in grammars[i][grammar_context]:
@@ -65,8 +65,24 @@ def build_grammars_and_mappings(max_grammar_length=4):
 
 	return grammars, index_to_column, column_to_index
 
-def convert_counted_grammar_to_percentages(grammar, size):
-	print(f'Converting counted grammar {size} to percent weighted version')
+
+def update_grammar_with_map(grammar, size, m, column_to_index):
+	queue = deque(maxlen=size)
+
+	for col in m:
+		col_index = column_to_index[col]
+		if len(queue) == queue.maxlen:
+			grammar_context = ','.join([str(i) for i in queue])
+			grammar[grammar_context][col_index] += 1
+
+		queue.append(col_index)
+
+	return grammar
+
+def convert_counted_grammar_to_percentages(grammar, size, verbose=True):
+	if verbose:
+		print(f'Converting counted grammar {size} to percent weighted version')
+		
 	new_grammar = {}
 
 	for input_column in grammar:

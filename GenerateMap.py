@@ -1,6 +1,9 @@
 import random
 
-def generate_map(grammar, seed, min_map_length, use_random_selection, start_index, flag_index, end_index):
+def generate_map(
+    grammar, seed, min_map_length, use_random_selection, start_index, 
+    flag_index, end_index, random_selection_chance=0):
+
     random.seed(seed)
     grammar_size = len(random.sample(grammar.keys(), 1)[0].split(','))
     grammar_map = [start_index for i in range(6)]
@@ -18,7 +21,10 @@ def generate_map(grammar, seed, min_map_length, use_random_selection, start_inde
             if use_random_selection:
                 current_weight += weight
             else:
-                current_weight += grammar_values[key]
+                if random_selection_chance > random.random():
+                    current_weight += weight
+                else:
+                    current_weight += grammar_values[key]
             
             if current_weight > weight_val:
                 if current_iteration < min_map_length and key == flag_index:
