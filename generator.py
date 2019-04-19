@@ -20,7 +20,7 @@ def define_map_key_indexes(column_to_index):
 	return start_index, flag_index, end_index
 
 def build_maps(
-	weighted_grammars, index_to_column, column_to_index, seed, min_map_length, 
+	weighted_grammars, index_to_column, column_to_index, seed, min_map_length, max_map_length,
 	use_random_selection, store_maps, display_png, display_ascii, display_heuristics=False):
 
 	start_index, flag_index, end_index = define_map_key_indexes(column_to_index)
@@ -29,8 +29,8 @@ def build_maps(
 	for i in tqdm(range(len(weighted_grammars)), ascii=True):
 		grammar = weighted_grammars[i]
 		map_grammar = GenerateMap.generate_map(
-			grammar, seed, min_map_length, use_random_selection, 
-			start_index=start_index, flag_index=flag_index, end_index=end_index)
+			grammar, seed, min_map_length, max_map_length, use_random_selection, 
+			start_index, flag_index, end_index)
 		map_text = GenerateMap.convert_grammar_array_to_map(map_grammar, index_to_column)
 
 		save_path = None
@@ -69,6 +69,7 @@ def build_arg_parser():
 		help='flag to generate generate random maps')
 
 	parser.add_argument('--min-map-length', type=int, help='minimum length of maps generated')
+	parser.add_argument('--max-map-length', type=int, help='maximum length of maps generated')
 	parser.add_argument('--seed', type=int, help='define seed for generation for consistent results')
 	parser.add_argument('--max-grammar-length', type=int, help='define max grammar length used in generated maps')
 	parser.add_argument('--save', action='store_true', help='flag to save images in screenshots directory')
@@ -83,6 +84,13 @@ def define_configuration(parser):
 	if parser.min_map_length:
 		min_map_length = parser.min_map_length
 
+	max_map_length = 200
+	if parser.max_map_length:
+		max_map_length = parser.max_map_length
+
+	if max_map_length < min_map_length:
+		raise Exception('max-map-length cannot be smaller than min-map-length')
+
 	seed = datetime.now()
 	if parser.seed:
 		seed = parser.seed
@@ -91,7 +99,7 @@ def define_configuration(parser):
 	if parser.max_grammar_length:
 		grammar_count = parser.max_grammar_length
 
-	return min_map_length, seed, grammar_count
+	return min_map_length, max_map_length, seed, grammar_count
 
 def build_grammar_info(min_grammar_size, max_grammar_size):
 	grammars, index_to_column, column_to_index = Grammar.build_grammars_and_mappings(max_grammar_length=max_grammar_size)
@@ -109,18 +117,18 @@ if __name__ == '__main__':
 		print('run "python generator.py --help" for options')
 		sys.exit(0)
 
-	min_map_length, seed, grammar_count = define_configuration(parser)
+	min_map_length, max_map_length, seed, grammar_count = define_configuration(parser)
 	grammars, index_to_column, column_to_index, weighted_grammars = build_grammar_info(0, grammar_count)
 
 	if parser.generate_weighted_maps:
 		build_maps(
-			weighted_grammars, index_to_column, column_to_index, seed, min_map_length, False, 
-			parser.save, parser.display_images, parser.display_ascii)
+			weighted_grammars, index_to_column, column_to_index, seed, min_map_length, max_map_length,
+			False, parser.save, parser.display_images, parser.display_ascii)
 
 	if parser.generate_random_maps:
 		build_maps(
-			weighted_grammars, index_to_column, column_to_index, seed, min_map_length, True, 
-			parser.save, parser.display_images, parser.display_ascii)
+			weighted_grammars, index_to_column, column_to_index, seed, min_map_length, max_map_length,
+			True, parser.save, parser.display_images, parser.display_ascii)
 
 	if parser.grammar_file:
 		if os.path.isfile(parser.grammar_file) == False:
@@ -142,8 +150,8 @@ if __name__ == '__main__':
 
 		weighted_grammars = [Grammar.convert_counted_grammar_to_percentages(grammar, grammar_size)]
 		build_maps(
-			weighted_grammars, index_to_column, column_to_index, seed, min_map_length, False, 
-			parser.save, parser.display_images, parser.display_ascii, display_heuristics=True)
+			weighted_grammars, index_to_column, column_to_index, seed, min_map_length, max_map_length,
+			False, parser.save, parser.display_images, parser.display_ascii, display_heuristics=True)
 
 
 

@@ -1,12 +1,9 @@
-from datetime import datetime
-from tqdm import tqdm
+from tqdm import tqdm, trange
 
 import random
 import json
 import sys
 import os
-
-from map_generation import generate_image
 
 import ExpressiveRange
 import GenerateMap
@@ -24,7 +21,7 @@ def rl(targets):
 	grammar = grammars[grammar_size - 1]
 
 	print('Running RL to best match specified targets.')
-	for iteration in tqdm(range(config.rl.max_iterations), ascii=True):
+	for iteration in trange(config.rl.max_iterations, ascii=True):
 		# initialize grammar targets with 0 for every heuristic used
 		average_evaluations = {}
 		for key in targets:
@@ -33,8 +30,12 @@ def rl(targets):
 		# Assess how the grammar we have is doing right now
 		weighted_grammar = Grammar.convert_counted_grammar_to_percentages(grammar, grammar_size, verbose=False)
 
-		for i in range(config.rl.assessment_iterations):
-			map_grammar = GenerateMap.generate_map(weighted_grammar, config.rl.seed, 50, False, start_index, flag_index, end_index)
+		for i in trange(config.rl.assessment_iterations, ascii=True):
+			map_grammar = GenerateMap.generate_map(
+				weighted_grammar, config.rl.seed, config.rl.min_map_length, 
+				config.rl.max_map_length, False, start_index, flag_index, end_index,
+				random_selection_chance=config.rl.random_selection_chance)
+
 			map_text = GenerateMap.convert_grammar_array_to_map(map_grammar, index_to_column)
 			m = map_text.strip().split('\n')
 
@@ -50,7 +51,6 @@ def rl(targets):
 			# to be utilized in updating the grammars count
 			min_eval_distance[key] = abs(targets[key] - average_evaluations[key])
 
-
 		# Now that we have an estimate of how the grammar is performing, we need to find several
 		# maps that perform closer to our desired metrics. 
 		maps = []
@@ -59,15 +59,17 @@ def rl(targets):
 		while len(maps) < config.rl.minimum_maps:
 			index += 1
 			if index > 10000:
-				print('\n\n\n')
+				print('\n\n\n\n\n')
 				print('Generating maps no longer creates closer maps. Calling off and ending grammar')
 				broken = True
 				break
 
 			# generate map
 			map_grammar = GenerateMap.generate_map(
-				weighted_grammar, random.random(), 50, False, start_index, flag_index, end_index,
-				random_selection_chance=0.15)
+				weighted_grammar, config.rl.seed, config.rl.min_map_length, 
+				config.rl.max_map_length, False, start_index, flag_index, end_index,
+				random_selection_chance=config.rl.random_selection_chance)
+				
 			map_text = GenerateMap.convert_grammar_array_to_map(map_grammar, index_to_column)
 			m = map_text.strip().split('\n')
 
@@ -123,4 +125,3 @@ if __name__ == '__main__':
 	set_target(ExpressiveRange.Type.Rewards, config.rl.target_rewards, targets)
 
 	rl(targets)
-
