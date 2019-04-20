@@ -1,5 +1,7 @@
 from tqdm import tqdm, trange
 
+import matplotlib.animation as animation
+import matplotlib.pyplot as plt
 import random
 import json
 import sys
@@ -11,7 +13,16 @@ import generator
 import Grammar
 import config
 
+random.seed(config.rl.seed)
+
+def animate_plot(figure, axis):
+	pass
+
 def rl(targets):
+	# style.use('fivethirtyeight')
+	# fig = plt.figure()
+	# axis = fig.add_subplot(1,1,1)
+
 	grammar_size = config.rl.grammar_size
 	grammars, index_to_column, column_to_index, weighted_grammars = generator.build_grammar_info(
 		grammar_size,
@@ -19,6 +30,10 @@ def rl(targets):
 
 	start_index, flag_index, end_index = generator.define_map_key_indexes(column_to_index)
 	grammar = grammars[grammar_size - 1]
+
+	results_path = os.path.join('rl_results', f'eval_{config.rl.grammar_name}.csv')
+	results_file = open(results_path, 'w')
+	results_file.write(','.join([str(heuristic_type).split('.')[1] for heuristic_type in targets]) + '\n')
 
 	print('Running RL to best match specified targets.')
 	for iteration in trange(config.rl.max_iterations, ascii=True):
@@ -30,10 +45,10 @@ def rl(targets):
 		# Assess how the grammar we have is doing right now
 		weighted_grammar = Grammar.convert_counted_grammar_to_percentages(grammar, grammar_size, verbose=False)
 
-		for i in trange(config.rl.assessment_iterations, ascii=True):
+		for i in range(config.rl.assessment_iterations):
 			map_grammar = GenerateMap.generate_map(
-				weighted_grammar, config.rl.seed, config.rl.min_map_length, 
-				config.rl.max_map_length, False, start_index, flag_index, end_index,
+				weighted_grammar, config.rl.min_map_length, config.rl.max_map_length, 
+				False, False, start_index, flag_index, end_index,
 				random_selection_chance=config.rl.random_selection_chance)
 
 			map_text = GenerateMap.convert_grammar_array_to_map(map_grammar, index_to_column)
@@ -42,14 +57,12 @@ def rl(targets):
 			for heuristic_type in targets:
 				average_evaluations[heuristic_type] += heuristic_type.evaluate(m)
 
-		min_eval_distance = {}
+
+		# compute average for the given heuristic
 		for key in average_evaluations:
-			# compute average for the given heuristic
 			average_evaluations[key] /= config.rl.assessment_iterations
 
-			# convert the average to min distance from target for a map 
-			# to be utilized in updating the grammars count
-			min_eval_distance[key] = abs(targets[key] - average_evaluations[key])
+		results_file.write(','.join([str(average_evaluations[t]) for t in average_evaluations]) + '\n')
 
 		# Now that we have an estimate of how the grammar is performing, we need to find several
 		# maps that perform closer to our desired metrics. 
@@ -66,8 +79,8 @@ def rl(targets):
 
 			# generate map
 			map_grammar = GenerateMap.generate_map(
-				weighted_grammar, config.rl.seed, config.rl.min_map_length, 
-				config.rl.max_map_length, False, start_index, flag_index, end_index,
+				weighted_grammar, config.rl.min_map_length, config.rl.max_map_length,
+				False, False, start_index, flag_index, end_index,
 				random_selection_chance=config.rl.random_selection_chance)
 				
 			map_text = GenerateMap.convert_grammar_array_to_map(map_grammar, index_to_column)
@@ -79,10 +92,11 @@ def rl(targets):
 			for eval_type in targets:
 				evaluation = eval_type.evaluate(m)
 
-				if abs(targets[eval_type] - evaluation) >= min_eval_distance[eval_type]:
+				if abs(targets[eval_type] - evaluation) > abs(targets[eval_type] - average_evaluations[eval_type]):
 					acceptable_map = False
 					break
 
+			if acceptable_map:
 				maps.append(m)
 
 		# break out of loop when map generation no longer creates valid maps that can be used
@@ -105,6 +119,7 @@ def rl(targets):
 	f = open(path, 'w')
 	f.write(json.dumps(grammar_info))
 	f.close()
+	results_file.close()
 	
 	# helpful text
 	cmd = f'python generator.py --grammar-file {path} --display-images'

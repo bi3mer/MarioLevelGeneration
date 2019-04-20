@@ -6,6 +6,7 @@ import ExpressiveRange
 import GenerateMap
 import argparse
 import Grammar
+import random
 import json
 import sys
 import os
@@ -16,7 +17,7 @@ def define_map_key_indexes(column_to_index):
 	start_index = column_to_index['|,:,:,:,:,:,:,:,:,:,:,:']
 	flag_index = column_to_index['|,:,:,:,:,:,:,:,:,:,flag,:']
 	end_index = column_to_index['|,=,f,f,f,f,f,f,f,f,f,flag_pole_top']
-
+	
 	return start_index, flag_index, end_index
 
 def build_maps(
@@ -26,11 +27,13 @@ def build_maps(
 	start_index, flag_index, end_index = define_map_key_indexes(column_to_index)
 
 	print('generating maps')
+	random.seed(seed)
 	for i in tqdm(range(len(weighted_grammars)), ascii=True):
 		grammar = weighted_grammars[i]
 		map_grammar = GenerateMap.generate_map(
-			grammar, seed, min_map_length, max_map_length, use_random_selection, 
-			start_index, flag_index, end_index)
+			grammar, min_map_length, max_map_length, True, 
+			use_random_selection, start_index, flag_index, end_index)
+
 		map_text = GenerateMap.convert_grammar_array_to_map(map_grammar, index_to_column)
 
 		save_path = None

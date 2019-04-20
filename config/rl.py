@@ -3,7 +3,7 @@
 # been hard coded below
 assessment_iterations = 100
 grammar_name = None
-max_iterations = 100
+max_iterations = 10000
 grammar_size = None
 minimum_maps = 10
 seed = 0

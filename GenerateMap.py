@@ -28,12 +28,14 @@ def bfs(grammar, grammar_map, grammar_size, flag_index):
     grammar_map += correct_path[grammar_size:]
 
 def generate_map(
-    grammar, seed, min_map_length, max_map_length, use_random_selection, 
+    grammar, min_map_length, max_map_length, auto_complete, use_random_selection, 
     start_index, flag_index, end_index, random_selection_chance=0):
     '''
     Generates a map of fixed length between min and max
+
+    TODO: remove the seed and have it be called in generate and rl instead. Right now
+          it is useful for debugging this thing
     '''
-    random.seed(seed)
     grammar_size = len(random.sample(grammar.keys(), 1)[0].split(','))
     grammar_map = [start_index for i in range(6)]
 
@@ -45,33 +47,34 @@ def generate_map(
         weight_val = random.uniform(0, 1)
         current_weight = 0.0
         weight = 1.0 / float(len(grammar_values))
-        
-        for key in grammar_values:
-            if current_iteration > max_map_length:
+
+        if current_iteration > max_map_length:
+            if auto_complete:
                 bfs(grammar, grammar_map, grammar_size, flag_index)
-                generate = False
-                break
-
-            if use_random_selection:
-                current_weight += weight
-            else:
-                if random_selection_chance > random.random():
-                    current_weight += weight
-                else:
-                    current_weight += grammar_values[key]
-            
-            if current_weight > weight_val:
-                if current_iteration < min_map_length and key == flag_index:
-                    continue
-                    
-                grammar_map.append(key)
-                if key == end_index:
-                    generate = False
-                    
-                break
                 
-        current_iteration += 1
+            generate = False
+            break
 
+        new_key = None
+        if use_random_selection or random_selection_chance > random.uniform(0,1):
+            new_key = random.choice(list(grammar_values.keys()))
+        else:
+            for key in grammar_values:
+                current_weight += grammar_values[key]
+                
+                if current_weight > weight_val:
+                    new_key = key
+                    break
+
+        if current_iteration < min_map_length and new_key == flag_index:
+            continue
+        else:
+            grammar_map.append(new_key)
+            current_iteration += 1
+
+            if new_key == end_index:
+                generate = False
+                
     return grammar_map
     
 def convert_grammar_array_to_map(grammar_map, grammar_to_col):
