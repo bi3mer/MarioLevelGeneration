@@ -1,7 +1,5 @@
 from tqdm import tqdm, trange
 
-import matplotlib.animation as animation
-import matplotlib.pyplot as plt
 import random
 import json
 import sys
@@ -15,14 +13,7 @@ import config
 
 random.seed(config.rl.seed)
 
-def animate_plot(figure, axis):
-	pass
-
 def rl(targets):
-	# style.use('fivethirtyeight')
-	# fig = plt.figure()
-	# axis = fig.add_subplot(1,1,1)
-
 	grammar_size = config.rl.grammar_size
 	grammars, index_to_column, column_to_index, weighted_grammars = generator.build_grammar_info(
 		grammar_size,
@@ -34,13 +25,25 @@ def rl(targets):
 	results_path = os.path.join('rl_results', f'eval_{config.rl.grammar_name}.csv')
 	results_file = open(results_path, 'w')
 	results_file.write(','.join([str(heuristic_type).split('.')[1] for heuristic_type in targets]) + '\n')
+	results_file.close()
+
+	# start live graph
+	os.popen(f'python live_graph.py {results_path}')
+
+	rl_eval_results = {}
+	for heuristic_type in targets:
+		rl_eval_results[heuristic_type] = []
 
 	print('Running RL to best match specified targets.')
+	average_evaluations = {}
+	for key in targets:
+		average_evaluations[key] = 1000
+
 	for iteration in trange(config.rl.max_iterations, ascii=True):
 		# initialize grammar targets with 0 for every heuristic used
-		average_evaluations = {}
+		new_average_evaluations = {}
 		for key in targets:
-			average_evaluations[key] = 0
+			new_average_evaluations[key] = 0
 
 		# Assess how the grammar we have is doing right now
 		weighted_grammar = Grammar.convert_counted_grammar_to_percentages(grammar, grammar_size, verbose=False)
@@ -55,14 +58,18 @@ def rl(targets):
 			m = map_text.strip().split('\n')
 
 			for heuristic_type in targets:
-				average_evaluations[heuristic_type] += heuristic_type.evaluate(m)
-
+				new_average_evaluations[heuristic_type] += heuristic_type.evaluate(m)
 
 		# compute average for the given heuristic
+		# TODO: only update if it is better than the previous attempt
 		for key in average_evaluations:
-			average_evaluations[key] /= config.rl.assessment_iterations
+			evaluation = new_average_evaluations[key] / config.rl.assessment_iterations
 
+			if abs()
+
+		results_file = open(results_path, 'a')
 		results_file.write(','.join([str(average_evaluations[t]) for t in average_evaluations]) + '\n')
+		results_file.close()
 
 		# Now that we have an estimate of how the grammar is performing, we need to find several
 		# maps that perform closer to our desired metrics. 
@@ -71,7 +78,9 @@ def rl(targets):
 		broken = False
 		while len(maps) < config.rl.minimum_maps:
 			index += 1
-			if index > 10000:
+
+			# if we have filled 50 x more than the minumum maps than we say we have done our best
+			if index > config.rl.minimum_maps * 1000:
 				print('\n\n\n\n\n')
 				print('Generating maps no longer creates closer maps. Calling off and ending grammar')
 				broken = True
