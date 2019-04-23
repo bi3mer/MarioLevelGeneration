@@ -3,9 +3,9 @@
 # been hard coded below
 assessment_iterations = 100
 grammar_name = None
-max_iterations = 100000
+max_iterations = 10000
 grammar_size = None
-minimum_maps = 1
+minimum_maps = 10
 seed = 0
 min_map_length = 50
 max_map_length = 200
@@ -14,7 +14,7 @@ random_selection_chance = 0.15
 # One of these need to be set but None is a valid option for rewards you do not
 # want set. All of these values should either be None or between 0 and 1
 target_coin_reward = None
-target_enemies = 0.7
+target_enemies = None
 target_linearity = 0.2
 target_rewards = None
 

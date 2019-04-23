@@ -13,6 +13,9 @@ import config
 
 random.seed(config.rl.seed)
 
+def get_closest(target, a, b):
+	return a if abs(target - a) < abs(target - b) else b
+
 def rl(targets):
 	grammar_size = config.rl.grammar_size
 	grammars, index_to_column, column_to_index, weighted_grammars = generator.build_grammar_info(
@@ -60,12 +63,12 @@ def rl(targets):
 			for heuristic_type in targets:
 				new_average_evaluations[heuristic_type] += heuristic_type.evaluate(m)
 
-		# compute average for the given heuristic
-		# TODO: only update if it is better than the previous attempt
 		for key in average_evaluations:
+			# compute average for the given heuristic
 			evaluation = new_average_evaluations[key] / config.rl.assessment_iterations
 
-			if abs()
+			# if better than previous average, than update so we expect better maps from now on
+			average_evaluations[key] = get_closest(targets[key], evaluation, average_evaluations[key])
 
 		results_file = open(results_path, 'a')
 		results_file.write(','.join([str(average_evaluations[t]) for t in average_evaluations]) + '\n')
@@ -79,8 +82,8 @@ def rl(targets):
 		while len(maps) < config.rl.minimum_maps:
 			index += 1
 
-			# if we have filled 50 x more than the minumum maps than we say we have done our best
-			if index > config.rl.minimum_maps * 1000:
+			# if we have filled 100x more than the minumum maps than we say we have done our best
+			if index > config.rl.minimum_maps * 100:
 				print('\n\n\n\n\n')
 				print('Generating maps no longer creates closer maps. Calling off and ending grammar')
 				broken = True
@@ -101,7 +104,11 @@ def rl(targets):
 			for eval_type in targets:
 				evaluation = eval_type.evaluate(m)
 
-				if abs(targets[eval_type] - evaluation) > abs(targets[eval_type] - average_evaluations[eval_type]):
+				if evaluation == average_evaluations[eval_type]:
+					acceptable_map = False
+					break
+
+				if get_closest(targets[eval_type], evaluation, average_evaluations[eval_type]) != evaluation:
 					acceptable_map = False
 					break
 
