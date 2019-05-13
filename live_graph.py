@@ -33,7 +33,7 @@ def animate(i):
     ax1.grid(True)
     ax1.set_xlabel('Training Epoch')
     ax1.set_ylabel('Performance')
-    ax1.legend(loc=4)
+    ax1.legend(loc=2)
     ax1.set_title('Live Training Progress')	
     ax1.set_yticks([0.1 * i for i in range(11)])
 

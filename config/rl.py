@@ -14,9 +14,9 @@ random_selection_chance = 0.15
 # One of these need to be set but None is a valid option for rewards you do not
 # want set. All of these values should either be None or between 0 and 1
 target_coin_reward = None
-target_enemies = None
-target_linearity = 0.2
-target_rewards = None
+target_enemies = 0.3
+target_linearity = 0.8
+target_rewards = 0.1
 
 # The following sets defaults and does basic error checking in the configuration
 # file when it is imported
